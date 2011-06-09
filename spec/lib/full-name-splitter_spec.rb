@@ -80,6 +80,12 @@ describe Incognito do
       "Han Van De Casteele"           => ["Han",            "Van De Casteele"     ],
       "Han Vande Casteele"            => ["Han",            "Vande Casteele"      ],
 
+      # Arabic
+      "Suraih ibn Hani"               => ["Suraih",         "ibn Hani"            ],
+      "Sumayya bint Khubbat"          => ["Sumayya",        "bint Khubbat"        ],
+      "Muhammad al-Hallaj"            => ["Muhammad",       "al-Hallaj"           ],
+      "Layla bint Zuhayr ibn Yazid al-Nahdiyah" => ["Layla","bint Zuhayr ibn Yazid al-Nahdiyah"],
+
       # Exceptions?
       # the architect Ludwig Mies van der Rohe, from the West German city of Aachen, was originally Ludwig Mies;
       "Ludwig Mies van der Rohe"      => ["Ludwig",         "Mies van der Rohe"   ],
