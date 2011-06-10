@@ -57,7 +57,7 @@ describe Incognito do
       "Johann Wolfgang von Goethe"    => [nil, "Johann Wolfgang", "von Goethe"         ],
 
       # Spanish-speaking countries
-      "Juan Martín de la Cruz Gómez"  => ["Jnil, uan Martín",    "de la Cruz Gómez"    ],
+      "Juan Martn de la Cruz Gez"     => [nil, "Juan Martn",     "de la Cruz Gez"      ],
       "Javier Reyes de la Barrera"    => [nil, "Javier",         "Reyes de la Barrera" ],
       "Rosa María Pérez Martínez Vda. de la Cruz" =>
                                          [nil, "Rosa María",    "Pérez Martínez Vda. de la Cruz"],
