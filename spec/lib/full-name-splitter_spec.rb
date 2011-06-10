@@ -117,7 +117,7 @@ describe Incognito do
       end
 
       it "should split #{full_name} to '#{split_name[0]}' and '#{split_name[1]}' and '#{split_name[2]}' when called as module function" do
-        FullNameSplitter.split(full_name).should == split_name
+        FullNameSplitter.split(full_name, true).should == split_name
       end
 
     end
@@ -127,11 +127,9 @@ end
 class CustomIncognito
   include FullNameSplitter
   full_name_splitter_options.merge!(
-      :honorific  => :title,
-      :first_name => :given_name,
-      :last_name  => :surname
+      :honorific  => :title
   )
-  attr_accessor :given_name, :surname, :title
+  attr_accessor :first_name, :last_name, :title
 end
 
 describe CustomIncognito do
@@ -146,7 +144,35 @@ describe CustomIncognito do
     EXAMPLES.each do |full_name, split_name|
       it "should split #{full_name} to '#{split_name[0]}' and '#{split_name[1]}' and '#{split_name[2]}'" do
         subject.full_name = full_name
-        [subject.title, subject.given_name, subject.surname].should == split_name
+        [subject.title, subject.first_name, subject.last_name].should == split_name
+      end
+    end
+  end
+end
+
+class CompatIncognito
+  include FullNameSplitter
+  attr_accessor :first_name, :last_name
+end
+
+describe CompatIncognito do
+  describe "#full_name=" do
+
+    #
+    # Environment
+    #
+
+    subject { CompatIncognito.new }
+
+    EXAMPLES.each do |full_name, split_name|
+      first = split_name[0] || ''
+      first += " " if split_name[0] and split_name[1]
+      first += split_name[1] if split_name[1]
+      first = first.gsub /[^\w]/, '' #punctuation doesn't really matter
+      it "should split #{full_name} to '#{first}' and '#{split_name[2]}'" do
+        subject.full_name = full_name
+        first_name = (subject.first_name || '').gsub /[^\w]/, '' #punctuation doesn't really matter
+        [first_name, subject.last_name].should == [first, split_name[2]]
       end
     end
   end

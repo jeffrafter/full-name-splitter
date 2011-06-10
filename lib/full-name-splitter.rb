@@ -20,9 +20,9 @@ module FullNameSplitter
 
   class Splitter
     
-    def initialize(full_name)
+    def initialize(full_name, honorific=false)
       @full_name  = full_name
-      @honorific = []
+      @honorific = [] if honorific
       @first_name = []
       @last_name  = []
       split!
@@ -45,7 +45,7 @@ module FullNameSplitter
     end
 
     def honorific
-      @honorific.empty? ? nil : @honorific[0].gsub(/[^\w]/, '')
+      @honorific.nil? || @honorific.empty? ? nil : @honorific[0].gsub(/[^\w]/, '')
     end
 
     def first_name
@@ -59,11 +59,11 @@ module FullNameSplitter
     private
 
     def honorific?
-      HONORIFICS.include?(@unit.downcase.gsub(/[^\w]/, '')) && @honorific.empty? && @first_name.empty? && @last_name.empty?
+      !@honorific.nil? && HONORIFICS.include?(@unit.downcase.gsub(/[^\w]/, '')) && @honorific.empty? && @first_name.empty? && @last_name.empty?
     end
 
     def has_honorific?
-      not @honorific.empty?
+      not @honorific.nil? and not @honorific.empty?
     end
 
     def prefix?
@@ -109,20 +109,23 @@ module FullNameSplitter
   
   def full_name
     o = self.class.full_name_splitter_options
-    ["#{__send__ o[:honorific]}.", __send__(o[:first_name]), __send__(o[:last_name])].compact.join(' ')
+    [("#{__send__ o[:honorific]}." if respond_to? o[:honorific]), __send__(o[:first_name]), __send__(o[:last_name])].compact.join(' ')
   end
   
   def full_name=(name)
     o = self.class.full_name_splitter_options
-    parts = split name
-    __send__ "#{o[:honorific]}=",  parts[0]
+    parts = split name, respond_to?("#{o[:honorific]}=")
+    __send__ "#{o[:honorific]}=",  parts[0] if respond_to?("#{o[:honorific]}=")
     __send__ "#{o[:first_name]}=", parts[1]
     __send__ "#{o[:last_name]}=",  parts[2]
   end
   
   private 
   
-  def split(name)
+  def split_with_honorific(name)
+    split(name, true)
+  end
+  def split(name, honorific=false)
     name = name.to_s.strip.gsub(/\s+/, ' ')
     
     if name.include?(',')
@@ -130,14 +133,14 @@ module FullNameSplitter
         split(/\s*,\s*/, 2).            # ",van  helsing" produces  ["", "van helsing"]
         map{ |u| u.empty? ? nil : u }   # but it should be [nil, "van helsing"] by lib convection
       if first
-        splitter = Splitter.new first
+        splitter = Splitter.new first, honorific
         first = ([splitter.first_name, splitter.last_name] * ' ').strip
         [splitter.honorific, first, last]
       else
         [nil, nil, last]
       end
     else
-      splitter = Splitter.new(name)
+      splitter = Splitter.new name, honorific
       [splitter.honorific, splitter.first_name, splitter.last_name]
     end
   end
