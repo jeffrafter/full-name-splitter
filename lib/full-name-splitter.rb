@@ -29,7 +29,7 @@ module FullNameSplitter
       while @unit = @units.shift do
         if honorific?
           @honorific << @unit
-        elsif prefix? or with_apostrophe? or (first_name? and last_unit? and not initial?)
+        elsif prefix? or with_apostrophe? or (first_name? and last_unit? and not initial?) or (has_honorific? and last_unit? and not first_name?)
           @last_name << @unit and break
         else
           @first_name << @unit
@@ -56,6 +56,10 @@ module FullNameSplitter
 
     def honorific?
       HONORIFICS.include?(@unit.downcase.gsub(/[^\w]/, '')) && @honorific.empty? && @first_name.empty? && @last_name.empty?
+    end
+
+    def has_honorific?
+      not @honorific.empty?
     end
 
     def prefix?
