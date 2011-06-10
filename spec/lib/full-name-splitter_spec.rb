@@ -1,30 +1,11 @@
 # -*- coding: utf-8 -*-
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-class Incognito
-  include FullNameSplitter
-  attr_accessor :first_name, :last_name, :honorific
-end
-
-describe Incognito do
-  describe "#full_name=" do
-
-    #
-    # Environment
-    #
-
-    subject { Incognito.new }
-
-    def gum(first, last)
-      "[#{first}] + [#{last}]"
-    end
-
-
     #
     # Examples
     #
 
-    {
+    EXAMPLES = {
       "John Smith"                    => [nil, "John",           "Smith"               ],
       "Kevin J. O'Connor"             => [nil, "Kevin J.",       "O'Connor"            ],
       "Gabriel Van Helsing"           => [nil, "Gabriel",        "Van Helsing"         ],
@@ -113,9 +94,38 @@ describe Incognito do
       "Hon. George W Bush"                => ["Hon",  "George W",       "Bush"         ],
       "Dr. John, Quincy Adams"            => ["Dr",   "John",    "Quincy Adams"        ],
 
-    }.
+    }
 
-    each do |full_name, split_name|
+class Incognito
+  include FullNameSplitter
+  attr_accessor :first_name, :last_name, :honorific
+end
+
+class CustomIncognito
+  include FullNameSplitter
+  full_name_splitter_options = {
+      :honorific  => :title,
+      :first_name => :given_name,
+      :last_name  => :surname
+  }
+  attr_accessor :given_name, :surname, :title
+end
+
+describe Incognito do
+  describe "#full_name=" do
+
+    #
+    # Environment
+    #
+
+    subject { Incognito.new }
+
+    def gum(first, last)
+      "[#{first}] + [#{last}]"
+    end
+
+
+    EXAMPLES.each do |full_name, split_name|
       it "should split #{full_name} to '#{split_name[0]}' and '#{split_name[1]}' and '#{split_name[2]}'" do
         subject.full_name = full_name
         [subject.honorific, subject.first_name, subject.last_name].should == split_name
