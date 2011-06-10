@@ -5,13 +5,17 @@ module FullNameSplitter
   PREFIXES = %w(de da la du del dei vda. dello della degli delle van von der den heer ten ter vande vanden vander voor ver aan mc mac ben ibn bint al).freeze
   HONORIFICS = %w(mr mrs miss ms dr capt ofc rev prof sir cr hon).freeze
 
-  attr_accessor :full_name_splitter_options
-  def full_name_splitter_options
-    @full_name_splitter_options ||= {
-      :honorific  => :honorific,
-      :first_name => :first_name,
-      :last_name  => :last_name
-    }
+  def self.included(model)
+    model.instance_eval do
+      def full_name_splitter_options
+        @full_name_splitter_options ||= superclass.full_name_splitter_options.dup if superclass.respond_to? :full_name_splitter_options
+        @full_name_splitter_options ||= {
+          :honorific  => :honorific,
+          :first_name => :first_name,
+          :last_name  => :last_name
+        }
+      end
+    end
   end
 
   class Splitter
@@ -104,12 +108,12 @@ module FullNameSplitter
   end
   
   def full_name
-    o = full_name_splitter_options
+    o = self.class.full_name_splitter_options
     ["#{__send__ o[:honorific]}.", __send__(o[:first_name]), __send__(o[:last_name])].compact.join(' ')
   end
   
   def full_name=(name)
-    o = full_name_splitter_options
+    o = self.class.full_name_splitter_options
     parts = split name
     __send__ "#{o[:honorific]}=",  parts[0]
     __send__ "#{o[:first_name]}=", parts[1]

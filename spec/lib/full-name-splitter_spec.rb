@@ -101,16 +101,6 @@ class Incognito
   attr_accessor :first_name, :last_name, :honorific
 end
 
-class CustomIncognito
-  include FullNameSplitter
-  full_name_splitter_options = {
-      :honorific  => :title,
-      :first_name => :given_name,
-      :last_name  => :surname
-  }
-  attr_accessor :given_name, :surname, :title
-end
-
 describe Incognito do
   describe "#full_name=" do
 
@@ -119,11 +109,6 @@ describe Incognito do
     #
 
     subject { Incognito.new }
-
-    def gum(first, last)
-      "[#{first}] + [#{last}]"
-    end
-
 
     EXAMPLES.each do |full_name, split_name|
       it "should split #{full_name} to '#{split_name[0]}' and '#{split_name[1]}' and '#{split_name[2]}'" do
@@ -135,6 +120,34 @@ describe Incognito do
         FullNameSplitter.split(full_name).should == split_name
       end
 
+    end
+  end
+end
+
+class CustomIncognito
+  include FullNameSplitter
+  full_name_splitter_options.merge!(
+      :honorific  => :title,
+      :first_name => :given_name,
+      :last_name  => :surname
+  )
+  attr_accessor :given_name, :surname, :title
+end
+
+describe CustomIncognito do
+  describe "#full_name=" do
+
+    #
+    # Environment
+    #
+
+    subject { CustomIncognito.new }
+
+    EXAMPLES.each do |full_name, split_name|
+      it "should split #{full_name} to '#{split_name[0]}' and '#{split_name[1]}' and '#{split_name[2]}'" do
+        subject.full_name = full_name
+        [subject.title, subject.given_name, subject.surname].should == split_name
+      end
     end
   end
 end
