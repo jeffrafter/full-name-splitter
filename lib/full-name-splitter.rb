@@ -109,7 +109,8 @@ module FullNameSplitter
   
   def full_name
     o = self.class.full_name_splitter_options
-    [("#{h}." if respond_to?(o[:honorific]) and h=__send__(o[:honorific])),
+    honorific = __send__(o[:honorific]) if o[:honorific] && respond_to?(o[:honorific])
+    [("#{honorific}." if honorific && !honorific.empty?),
      __send__(o[:first_name]),
      __send__(o[:last_name])].compact.join(' ')
   end
